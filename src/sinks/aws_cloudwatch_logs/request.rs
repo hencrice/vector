@@ -8,11 +8,15 @@ use aws_sdk_cloudwatchlogs::error::{
     CreateLogGroupError, CreateLogGroupErrorKind, CreateLogStreamError, CreateLogStreamErrorKind,
     DescribeLogStreamsError, DescribeLogStreamsErrorKind, PutLogEventsError,
 };
+use aws_sdk_cloudwatchlogs::operation::PutLogEvents;
+
 use aws_sdk_cloudwatchlogs::model::InputLogEvent;
 use aws_sdk_cloudwatchlogs::output::{DescribeLogStreamsOutput, PutLogEventsOutput};
 use aws_sdk_cloudwatchlogs::types::SdkError;
 use aws_sdk_cloudwatchlogs::Client as CloudwatchLogsClient;
+use aws_smithy_http::operation::{Operation, Request};
 use futures::{future::BoxFuture, ready, FutureExt};
+use indexmap::IndexMap;
 use tokio::sync::oneshot;
 
 use crate::sinks::aws_cloudwatch_logs::service::CloudwatchError;
@@ -28,8 +32,10 @@ pub struct CloudwatchFuture {
 
 struct Client {
     client: CloudwatchLogsClient,
+    smithy_client: aws_smithy_client::Client<aws_smithy_client::conns::Https>,
     stream_name: String,
     group_name: String,
+    headers: IndexMap<string, string>,
 }
 
 type ClientResult<T, E> = BoxFuture<'static, Result<T, SdkError<E>>>;
@@ -46,6 +52,8 @@ impl CloudwatchFuture {
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
         client: CloudwatchLogsClient,
+        smithy_client: aws_smithy_client::Client<aws_smithy_client::conns::Https>,
+        headers: IndexMap<string, string>,
         stream_name: String,
         group_name: String,
         create_missing_group: bool,
@@ -56,8 +64,10 @@ impl CloudwatchFuture {
     ) -> Self {
         let client = Client {
             client,
+            smithy_client,
             stream_name,
             group_name,
+            headers,
         };
 
         let state = if let Some(token) = token {
@@ -212,18 +222,27 @@ impl Client {
         sequence_token: Option<String>,
         log_events: Vec<InputLogEvent>,
     ) -> ClientResult<PutLogEventsOutput, PutLogEventsError> {
-        let client = self.client.clone();
         let group_name = self.group_name.clone();
         let stream_name = self.stream_name.clone();
         Box::pin(async move {
-            client
-                .put_log_events()
-                .set_log_events(Some(log_events))
-                .set_sequence_token(sequence_token)
-                .log_group_name(group_name)
-                .log_stream_name(stream_name)
-                .send()
-                .await
+            // #12760 this is a relatively convoluted way of changing the headers of a request
+            // about to be sent. https://github.com/awslabs/aws-sdk-rust/issues/537 should
+            // eventually make this better.
+            let op = PutLogEvents::builder()
+            .set_log_events(Some(log_events))
+            .set_sequence_token(sequence_token)
+            .log_group_name(group_name)
+            .log_stream_name(stream_name)
+            .build()
+            .map_err(|err| aws_smithy_http::result::SdkError::ConstructionFailure(err.into()))?
+            .make_operation(client.conf()).await?;
+            
+            let (req, parts) = op.into_request_response();
+            let (body, props) = req.into_parts();
+            for(header, value) in self.headers.iter() {
+                body.headers_mut().insert(header.as_str(), HeaderValue::from_static(value.as_str()));
+            }
+            self.smithy_client.call(Operation::from_parts(Request::from_parts(body, props), parts)).await
         })
     }
 
