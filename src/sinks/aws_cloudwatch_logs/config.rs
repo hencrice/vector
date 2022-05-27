@@ -1,4 +1,5 @@
 use aws_sdk_cloudwatchlogs::Client as CloudwatchLogsClient;
+use aws_smithy_types::retry::RetryConfig;
 use futures::FutureExt;
 use serde::{Deserialize, Serialize};
 use tower::ServiceBuilder;
@@ -88,8 +89,15 @@ impl CloudwatchLogsSinkConfig {
     }
 
     pub async fn create_smithy_client(&self, proxy: &ProxyConfig) -> crate::Result<aws_smithy_client::Client> {
+        let region = match self.region.region() {
+            Some(region) => Ok(region),
+            None => aws_config::default_provider::region::default_provider()
+                .region()
+                .await
+                .ok_or("Could not determine region from Vector configuration or default providers"),
+        }?;
         create_smithy_client(
-            self.region.region(),
+            region,
             proxy,
             &self.tls,
             true,
