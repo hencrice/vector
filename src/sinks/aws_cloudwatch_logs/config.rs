@@ -89,9 +89,11 @@ impl CloudwatchLogsSinkConfig {
 
     pub async fn create_smithy_client(&self, proxy: &ProxyConfig) -> crate::Result<aws_smithy_client::Client> {
         create_smithy_client(
+            self.region.region(),
             proxy,
             &self.tls,
             true,
+            RetryConfig::disabled(),
         )
         .await
     }
