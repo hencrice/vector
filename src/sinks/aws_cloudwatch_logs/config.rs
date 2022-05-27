@@ -1,3 +1,4 @@
+use aws_config::meta::region::ProvideRegion;
 use aws_sdk_cloudwatchlogs::Client as CloudwatchLogsClient;
 use aws_smithy_types::retry::RetryConfig;
 use futures::FutureExt;
