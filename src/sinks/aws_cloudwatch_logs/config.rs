@@ -97,7 +97,7 @@ impl CloudwatchLogsSinkConfig {
                 .await
                 .ok_or("Could not determine region from Vector configuration or default providers"),
         }?;
-        create_smithy_client(
+        create_smithy_client::<CloudwatchLogsClientBuilder>(
             region,
             proxy,
             &self.tls,
