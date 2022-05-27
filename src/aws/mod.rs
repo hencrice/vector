@@ -148,7 +148,7 @@ pub async fn create_client<T: ClientBuilder>(
 
     let config = config_builder.build();
 
-    let client = create_smithy_client(
+    let client = create_smithy_client::<T>(
         region, proxy, tls_options, is_sink, retry_config).await?;
 
     Ok(T::build(client, &config))
