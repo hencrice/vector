@@ -82,11 +82,13 @@ pub trait ClientBuilder {
     fn build(client: aws_smithy_client::Client, config: &aws_types::SdkConfig) -> Self::Client;
 }
 
-pub async fn create_smithy_client(
+pub async fn create_smithy_client<T: ClientBuilder>(
+    region: Region, 
     proxy: &ProxyConfig,
     tls_options: &Option<TlsConfig>,
     is_sink: bool,
-) -> create::Result<aws_smithy_client::Client> {
+    retry_config: RetryConfig,
+) -> crate::Result<aws_smithy_client::Client> {
     // Now build the client.
     let tls_settings = MaybeTlsSettings::tls_client(tls_options)?;
 
@@ -146,7 +148,8 @@ pub async fn create_client<T: ClientBuilder>(
 
     let config = config_builder.build();
 
-    let client = create_smithy_client(proxy, tls_options, is_sink).await?;
+    let client = create_smithy_client(
+        region, proxy, tls_options, is_sink, retry_config).await?;
 
     Ok(T::build(client, &config))
 }

@@ -25,7 +25,7 @@ use crate::{
         Healthcheck, VectorSink,
     },
     template::Template,
-    tls::{MaybeTlsSettings, TlsConfig},
+    tls::TlsConfig,
 };
 
 pub struct CloudwatchLogsClientBuilder;

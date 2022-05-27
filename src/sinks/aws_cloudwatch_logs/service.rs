@@ -310,7 +310,7 @@ impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc {
 pub struct CloudwatchLogsSvc {
     client: CloudwatchLogsClient,
     smithy_client: aws_smithy_client::Client<aws_smithy_client::conns::Https>,
-    headers: IndexMap<string, string>,
+    headers: IndexMap<String, String>,
     stream_name: String,
     group_name: String,
     create_missing_group: bool,

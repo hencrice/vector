@@ -35,7 +35,7 @@ struct Client {
     smithy_client: aws_smithy_client::Client<aws_smithy_client::conns::Https>,
     stream_name: String,
     group_name: String,
-    headers: IndexMap<string, string>,
+    headers: IndexMap<String, String>,
 }
 
 type ClientResult<T, E> = BoxFuture<'static, Result<T, SdkError<E>>>;
@@ -53,7 +53,7 @@ impl CloudwatchFuture {
     pub(super) fn new(
         client: CloudwatchLogsClient,
         smithy_client: aws_smithy_client::Client<aws_smithy_client::conns::Https>,
-        headers: IndexMap<string, string>,
+        headers: IndexMap<String, String>,
         stream_name: String,
         group_name: String,
         create_missing_group: bool,
@@ -235,12 +235,12 @@ impl Client {
             .log_stream_name(stream_name)
             .build()
             .map_err(|err| aws_smithy_http::result::SdkError::ConstructionFailure(err.into()))?
-            .make_operation(client.conf()).await?;
+            .make_operation(self.client.conf()).await?;
             
             let (req, parts) = op.into_request_response();
             let (body, props) = req.into_parts();
             for(header, value) in self.headers.iter() {
-                body.headers_mut().insert(header.as_str(), HeaderValue::from_static(value.as_str()));
+                body.headers_mut().insert(header.as_str(), http::HeaderValue::from_static(value.as_str()));
             }
             self.smithy_client.call(Operation::from_parts(Request::from_parts(body, props), parts)).await
         })
