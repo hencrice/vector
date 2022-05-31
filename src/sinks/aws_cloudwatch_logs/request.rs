@@ -226,6 +226,7 @@ impl Client {
     ) -> ClientResult<PutLogEventsOutput, PutLogEventsError> {
         let group_name = self.group_name.clone();
         let stream_name = self.stream_name.clone();
+        let headers = self.headers.clone();
         Box::pin(async move {
             // #12760 this is a relatively convoluted way of changing the headers of a request
             // about to be sent. https://github.com/awslabs/aws-sdk-rust/issues/537 should
@@ -245,7 +246,7 @@ impl Client {
             
             let (req, parts) = op.into_request_response();
             let (body, props) = req.into_parts();
-            for(header, value) in self.headers.iter() {
+            for(header, value) in headers.iter() {
                 body.headers_mut().insert(header.as_str(), http::HeaderValue::from_static(value.as_str()));
             }
             self.smithy_client.call(Operation::from_parts(Request::from_parts(body, props), parts)).await

@@ -293,7 +293,7 @@ impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc {
 
             request::CloudwatchFuture::new(
                 self.client.clone(),
-                self.smithy_client.clone(),
+                self.smithy_client,
                 self.headers,
                 self.stream_name.clone(),
                 self.group_name.clone(),
