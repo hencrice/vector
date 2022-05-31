@@ -121,8 +121,8 @@ impl DriverResponse for CloudwatchResponse {
 
 impl CloudwatchLogsPartitionSvc {
     pub fn new(config: CloudwatchLogsSinkConfig, client: CloudwatchLogsClient,
-    smithy_client: aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
-    aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>) -> Self {
+    smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
+    aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>>) -> Self {
         let request_settings = config.request.unwrap_with(&TowerRequestConfig::default());
 
         Self {
@@ -334,5 +334,6 @@ pub struct CloudwatchLogsPartitionSvc {
     clients: HashMap<CloudwatchKey, Svc>,
     request_settings: TowerRequestSettings,
     client: CloudwatchLogsClient,
-    smithy_client: aws_smithy_client::Client<aws_smithy_client::conns::Https>,
+    smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
+    aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>>,
 }
