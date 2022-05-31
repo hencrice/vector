@@ -113,7 +113,7 @@ impl CloudwatchLogsSinkConfig {
 impl SinkConfig for CloudwatchLogsSinkConfig {
     async fn build(&self, cx: SinkContext) -> crate::Result<(VectorSink, Healthcheck)> {
         let batcher_settings = self.batch.into_batcher_settings()?;
-        let request_settings = self.request.unwrap_with(&RequestConfig::default());
+        let request_settings = self.request.tower.unwrap_with(&RequestConfig::default());
         let client = self.create_client(cx.proxy()).await?;
         let smithy_client = self.create_smithy_client(cx.proxy()).await?;
         let svc = ServiceBuilder::new()

@@ -201,8 +201,8 @@ impl CloudwatchLogsSvc {
         config: &CloudwatchLogsSinkConfig,
         key: &CloudwatchKey,
         client: CloudwatchLogsClient,
-        smithy_client: aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
-        aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>,
+        smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
+        aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>>,
     ) -> Self {
         let group_name = key.group.clone();
         let stream_name = key.stream.clone();
@@ -293,7 +293,7 @@ impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc {
 
             request::CloudwatchFuture::new(
                 self.client.clone(),
-                self.smithy_client,
+                self.smithy_client.clone(),
                 self.headers,
                 self.stream_name.clone(),
                 self.group_name.clone(),
