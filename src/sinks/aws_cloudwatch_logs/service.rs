@@ -121,7 +121,8 @@ impl DriverResponse for CloudwatchResponse {
 
 impl CloudwatchLogsPartitionSvc {
     pub fn new(config: CloudwatchLogsSinkConfig, client: CloudwatchLogsClient,
-    smithy_client: aws_smithy_client::Client<aws_smithy_client::conns::Https>) -> Self {
+    smithy_client: aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
+    aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>) -> Self {
         let request_settings = config.request.unwrap_with(&TowerRequestConfig::default());
 
         Self {
@@ -200,7 +201,8 @@ impl CloudwatchLogsSvc {
         config: &CloudwatchLogsSinkConfig,
         key: &CloudwatchKey,
         client: CloudwatchLogsClient,
-        smithy_client: aws_smithy_client::Client<aws_smithy_client::conns::Https>,
+        smithy_client: aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
+        aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>,
     ) -> Self {
         let group_name = key.group.clone();
         let stream_name = key.stream.clone();
@@ -309,7 +311,8 @@ impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc {
 
 pub struct CloudwatchLogsSvc {
     client: CloudwatchLogsClient,
-    smithy_client: aws_smithy_client::Client<aws_smithy_client::conns::Https>,
+    smithy_client: aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
+    aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>,
     headers: IndexMap<String, String>,
     stream_name: String,
     group_name: String,

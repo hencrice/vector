@@ -32,7 +32,8 @@ pub struct CloudwatchFuture {
 
 struct Client {
     client: CloudwatchLogsClient,
-    smithy_client: aws_smithy_client::Client<aws_smithy_client::conns::Https>,
+    smithy_client: aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
+    aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>,
     stream_name: String,
     group_name: String,
     headers: IndexMap<String, String>,
@@ -52,7 +53,8 @@ impl CloudwatchFuture {
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
         client: CloudwatchLogsClient,
-        smithy_client: aws_smithy_client::Client<aws_smithy_client::conns::Https>,
+        smithy_client: aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
+        aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>,
         headers: IndexMap<String, String>,
         stream_name: String,
         group_name: String,
