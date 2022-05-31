@@ -237,7 +237,11 @@ impl Client {
             .log_stream_name(stream_name)
             .build()
             .map_err(|err| aws_smithy_http::result::SdkError::ConstructionFailure(err.into()))?
-            .make_operation(self.client.conf()).await?;
+            .make_operation(self.client.conf())
+            .await
+            .map_err(|err| {
+                aws_smithy_http::result::SdkError::ConstructionFailure(err.into())
+            })?;
             
             let (req, parts) = op.into_request_response();
             let (body, props) = req.into_parts();
