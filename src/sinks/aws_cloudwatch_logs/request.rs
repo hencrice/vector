@@ -224,6 +224,7 @@ impl Client {
         sequence_token: Option<String>,
         log_events: Vec<InputLogEvent>,
     ) -> ClientResult<PutLogEventsOutput, PutLogEventsError> {
+        let client = self.client.clone();
         let group_name = self.group_name.clone();
         let stream_name = self.stream_name.clone();
         let headers = self.headers.clone();
@@ -249,7 +250,7 @@ impl Client {
             for(header, value) in headers.iter() {
                 body.headers_mut().insert(header.as_str(), http::HeaderValue::from_static(value.as_str()));
             }
-            self.smithy_client.call(Operation::from_parts(Request::from_parts(body, props), parts)).await
+            client.handle.client.call(Operation::from_parts(Request::from_parts(body, props), parts)).await
         })
     }
 
