@@ -123,7 +123,7 @@ impl CloudwatchLogsPartitionSvc {
     pub fn new(config: CloudwatchLogsSinkConfig, client: CloudwatchLogsClient,
     smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
     aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>>) -> Self {
-        let request_settings = config.request.unwrap_with(&TowerRequestConfig::default());
+        let request_settings = config.request.tower.unwrap_with(&TowerRequestConfig::default());
 
         Self {
             config,
