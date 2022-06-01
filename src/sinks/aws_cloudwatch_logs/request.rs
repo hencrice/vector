@@ -252,7 +252,7 @@ impl Client {
                 let owned_header = header.to_owned();
                 let owned_value = value.to_owned();
                 body.headers_mut().insert(
-                    http::header::HeaderName::from_bytes(owned_header.as_str()),
+                    http::header::HeaderName::from_static(owned_header.as_str()),
                     // header,
                     http::HeaderValue::from_static(owned_value.as_str()));
             }
