@@ -254,7 +254,7 @@ impl Client {
                 body.headers_mut().insert(
                     owned_header.as_str(),
                     // header,
-                    owned_value.as_str());
+                    http::HeaderValue::from_str(owned_value.as_str()));
             }
             client.call(Operation::from_parts(Request::from_parts(body, props), parts)).await
         })
