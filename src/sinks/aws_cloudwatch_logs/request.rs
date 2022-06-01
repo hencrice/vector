@@ -220,7 +220,7 @@ impl Future for CloudwatchFuture {
 
 impl Client {
     pub fn put_logs(
-        &self,
+        self,
         sequence_token: Option<String>,
         log_events: Vec<InputLogEvent>,
     ) -> ClientResult<PutLogEventsOutput, PutLogEventsError> {
