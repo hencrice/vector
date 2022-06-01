@@ -43,7 +43,7 @@ type Svc = Buffer<
         RateLimit<
             Retry<
                 FixedRetryPolicy<CloudwatchRetryLogic<()>>,
-                Buffer<Timeout<CloudwatchLogsSvc>, Vec<InputLogEvent>>,
+                Buffer<Timeout<CloudwatchLogsSvc<'a>>, Vec<InputLogEvent>>,
             >,
         >,
     >,
@@ -271,7 +271,7 @@ impl CloudwatchLogsSvc<'a> {
     }
 }
 
-impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc {
+impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc<'a> {
     type Response = ();
     type Error = CloudwatchError;
     type Future = request::CloudwatchFuture;
@@ -291,7 +291,7 @@ impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc {
             let (tx, rx) = oneshot::channel();
             self.token_rx = Some(rx);
 
-            request::CloudwatchFuture::new(
+            request::CloudwatchFuture<'a>::new(
                 self.client.clone(),
                 self.smithy_client.clone(),
                 self.headers,

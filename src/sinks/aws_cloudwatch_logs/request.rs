@@ -48,7 +48,7 @@ enum State {
     Put(ClientResult<PutLogEventsOutput, PutLogEventsError>),
 }
 
-impl CloudwatchFuture {
+impl <'a> CloudwatchFuture {
     /// Panics if events.is_empty()
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
@@ -89,7 +89,7 @@ impl CloudwatchFuture {
     }
 }
 
-impl Future for CloudwatchFuture {
+impl Future for CloudwatchFuture<'a> {
     type Output = Result<(), CloudwatchError>;
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output> {
@@ -218,7 +218,7 @@ impl Future for CloudwatchFuture {
     }
 }
 
-impl Client<'a> {
+impl <'a> Client {
     pub fn put_logs(
         &self,
         sequence_token: Option<String>,
