@@ -250,8 +250,9 @@ impl Client {
             let (mut body, props) = req.into_parts();
             for(header, value) in headers.into_iter() {
                 body.headers_mut().insert(
-                    http::header::HeaderName::from_static(header.as_str()),
-                    http::HeaderValue::from_static(value.as_str()));
+                    http::header::HeaderName::from_static(header.to_owned().as_str()),
+                    // header,
+                    http::HeaderValue::from_static(value.to_owned().as_str()));
             }
             client.call(Operation::from_parts(Request::from_parts(body, props), parts)).await
         })
