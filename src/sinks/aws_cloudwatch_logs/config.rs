@@ -1,4 +1,3 @@
-use aws_config::meta::region::ProvideRegion;
 use aws_sdk_cloudwatchlogs::Client as CloudwatchLogsClient;
 use aws_smithy_types::retry::RetryConfig;
 use futures::FutureExt;
@@ -7,7 +6,7 @@ use tower::ServiceBuilder;
 
 use crate::{
     aws::{
-        create_client, create_smithy_client, AwsAuthentication, ClientBuilder, RegionOrEndpoint,
+        create_client, create_smithy_client, resolve_region, AwsAuthentication, ClientBuilder, RegionOrEndpoint,
     },
     codecs::Encoder,
     config::{
@@ -95,13 +94,7 @@ impl CloudwatchLogsSinkConfig {
         &self,
         proxy: &ProxyConfig,
     ) -> crate::Result<aws_smithy_client::Client> {
-        let region = match self.region.region() {
-            Some(region) => Ok(region),
-            None => aws_config::default_provider::region::default_provider()
-                .region()
-                .await
-                .ok_or("Could not determine region from Vector configuration or default providers"),
-        }?;
+        let region = resolve_region(self.region.region())?;
         create_smithy_client::<CloudwatchLogsClientBuilder>(
             region,
             proxy,

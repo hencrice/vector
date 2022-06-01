@@ -19,7 +19,12 @@ use futures::{future::BoxFuture, ready, FutureExt};
 use indexmap::IndexMap;
 use tokio::sync::oneshot;
 
-use crate::sinks::aws_cloudwatch_logs::service::CloudwatchError;
+use crate::sinks::aws_cloudwatch_logs::{
+    service::{
+        CloudwatchError,
+        SmithyClient,
+    },
+};
 
 pub struct CloudwatchFuture {
     client: Client,
@@ -36,12 +41,7 @@ struct Client {
     // client cannot set headers
     //
     // https://github.com/awslabs/aws-sdk-rust/issues/537
-    smithy_client: std::sync::Arc<
-        aws_smithy_client::Client<
-            aws_smithy_client::erase::DynConnector,
-            aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>,
-        >,
-    >,
+    smithy_client: SmithyClient,
     stream_name: String,
     group_name: String,
     headers: IndexMap<String, String>,
@@ -61,12 +61,7 @@ impl CloudwatchFuture {
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
         client: CloudwatchLogsClient,
-        smithy_client: std::sync::Arc<
-            aws_smithy_client::Client<
-                aws_smithy_client::erase::DynConnector,
-                aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>,
-            >,
-        >,
+        smithy_client: SmithyClient,
         headers: IndexMap<String, String>,
         stream_name: String,
         group_name: String,
