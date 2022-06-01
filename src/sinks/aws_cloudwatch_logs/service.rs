@@ -198,7 +198,7 @@ impl Service<BatchCloudwatchRequest> for CloudwatchLogsPartitionSvc {
 
 impl CloudwatchLogsSvc {
     pub fn new(
-        config: &CloudwatchLogsSinkConfig,
+        config: &'static CloudwatchLogsSinkConfig,
         key: &CloudwatchKey,
         client: CloudwatchLogsClient,
         smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
