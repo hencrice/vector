@@ -309,11 +309,11 @@ impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc {
     }
 }
 
-pub struct CloudwatchLogsSvc<'a> {
+pub struct CloudwatchLogsSvc {
     client: CloudwatchLogsClient,
     smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
     aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>>,
-    headers: &'a IndexMap<String, String>,
+    headers: &'static IndexMap<String, String>,
     stream_name: String,
     group_name: String,
     create_missing_group: bool,
