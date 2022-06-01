@@ -249,10 +249,12 @@ impl Client {
             let (req, parts) = op.into_request_response();
             let (mut body, props) = req.into_parts();
             for(header, value) in headers.into_iter() {
+                let owned_header = header.to_owned();
+                let owned_value = value.to_owned();
                 body.headers_mut().insert(
-                    http::header::HeaderName::from_static(header.to_owned().as_str()),
+                    http::header::HeaderName::from_bytes(owned_header.as_str()),
                     // header,
-                    http::HeaderValue::from_static(value.to_owned().as_str()));
+                    http::HeaderValue::from_static(owned_value.as_str()));
             }
             client.call(Operation::from_parts(Request::from_parts(body, props), parts)).await
         })
