@@ -271,10 +271,10 @@ impl CloudwatchLogsSvc {
     }
 }
 
-impl <'a> Service<Vec<InputLogEvent>> for CloudwatchLogsSvc<'a> {
+impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc {
     type Response = ();
     type Error = CloudwatchError;
-    type Future<'a> = request::CloudwatchFuture<'a>;
+    type Future = request::CloudwatchFuture;
 
     fn poll_ready(&mut self, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
         if let Some(rx) = &mut self.token_rx {
@@ -329,9 +329,9 @@ impl EncodedLength for InputLogEvent {
 }
 
 #[derive(Clone)]
-pub struct CloudwatchLogsPartitionSvc<'a> {
+pub struct CloudwatchLogsPartitionSvc {
     config: CloudwatchLogsSinkConfig,
-    clients: HashMap<CloudwatchKey, Svc<'a>>,
+    clients: HashMap<CloudwatchKey, Svc>,
     request_settings: TowerRequestSettings,
     client: CloudwatchLogsClient,
     smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
