@@ -254,7 +254,9 @@ impl Client {
                 body.headers_mut().insert(
                     owned_header.as_str(),
                     // header,
-                    http::HeaderValue::from_str(owned_value.as_str()));
+                    http::HeaderValue::from_str(owned_value.as_str()).map_err(|err| {
+                        aws_smithy_http::result::SdkError::ConstructionFailure(err.into())
+                    })?);
             }
             client.call(Operation::from_parts(Request::from_parts(body, props), parts)).await
         })
