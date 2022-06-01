@@ -206,13 +206,12 @@ impl CloudwatchLogsSvc {
     ) -> Self {
         let group_name = key.group.clone();
         let stream_name = key.stream.clone();
-        let headers = config.request.headers.clone();
 
         let create_missing_group = config.create_missing_group.unwrap_or(true);
         let create_missing_stream = config.create_missing_stream.unwrap_or(true);
 
         CloudwatchLogsSvc {
-            headers,
+            headers: &config.request.headers,
             client,
             smithy_client,
             stream_name,
@@ -295,7 +294,7 @@ impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc {
             request::CloudwatchFuture::new(
                 self.client.clone(),
                 self.smithy_client.clone(),
-                self.headers.clone(),
+                self.headers,
                 self.stream_name.clone(),
                 self.group_name.clone(),
                 self.create_missing_group,
@@ -314,7 +313,7 @@ pub struct CloudwatchLogsSvc {
     client: CloudwatchLogsClient,
     smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
     aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>>,
-    headers: IndexMap<String, String>,
+    headers: &IndexMap<String, String>,
     stream_name: String,
     group_name: String,
     create_missing_group: bool,
