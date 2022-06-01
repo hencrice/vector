@@ -23,6 +23,7 @@ use crate::{
             },
             http::{RequestConfig},
             BatchConfig, Compression, ServiceBuilderExt, SinkBatchSettings,
+            TowerRequestConfig,
         },
         Healthcheck, VectorSink,
     },
