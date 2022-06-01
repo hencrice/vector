@@ -231,7 +231,7 @@ impl Client {
         sequence_token: Option<String>,
         log_events: Vec<InputLogEvent>,
     ) -> ClientResult<PutLogEventsOutput, PutLogEventsError> {
-        let client = self.smithy_client.clone();
+        let client = std::sync::Arc::clone(&self.smithy_client);
         let cw_client = self.client.clone();
         let group_name = self.group_name.clone();
         let stream_name = self.stream_name.clone();
