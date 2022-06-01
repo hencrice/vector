@@ -252,8 +252,9 @@ impl Client {
                 let owned_header = header.to_owned();
                 let owned_value = value.to_owned();
                 body.headers_mut().insert(
-                    owned_header.as_str(),
-                    // header,
+                    http::HeaderValue::from_str(owned_header.as_str()).map_err(|err| {
+                        aws_smithy_http::result::SdkError::ConstructionFailure(err.into())
+                    })?,
                     http::HeaderValue::from_str(owned_value.as_str()).map_err(|err| {
                         aws_smithy_http::result::SdkError::ConstructionFailure(err.into())
                     })?);
