@@ -36,7 +36,7 @@ struct Client {
     aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>>,
     stream_name: String,
     group_name: String,
-    headers: &IndexMap<String, String>,
+    headers: IndexMap<String, String>,
 }
 
 type ClientResult<T, E> = BoxFuture<'static, Result<T, SdkError<E>>>;
@@ -55,7 +55,7 @@ impl CloudwatchFuture {
         client: CloudwatchLogsClient,
         smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
         aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>>,
-        headers: &IndexMap<String, String>,
+        headers: IndexMap<String, String>,
         stream_name: String,
         group_name: String,
         create_missing_group: bool,
@@ -248,9 +248,9 @@ impl Client {
             
             let (req, parts) = op.into_request_response();
             let (mut body, props) = req.into_parts();
-            for(header, value) in headers.into_iter() {
-                let owned_header = header.to_owned();
-                let owned_value = value.to_owned();
+            for(header, value) in headers.iter() {
+                let owned_header = header.clone();
+                let owned_value = value.clone();
                 body.headers_mut().insert(
                     http::header::HeaderName::from_bytes(owned_header.as_bytes()).map_err(|err| {
                         aws_smithy_http::result::SdkError::ConstructionFailure(err.into())
