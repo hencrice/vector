@@ -30,13 +30,13 @@ pub struct CloudwatchFuture {
     token_tx: Option<oneshot::Sender<Option<String>>>,
 }
 
-struct Client {
+struct Client<'a> {
     client: CloudwatchLogsClient,
     smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
     aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>>,
     stream_name: String,
     group_name: String,
-    headers: &IndexMap<String, String>,
+    headers: &'a IndexMap<String, String>,
 }
 
 type ClientResult<T, E> = BoxFuture<'static, Result<T, SdkError<E>>>;
