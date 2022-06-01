@@ -21,8 +21,8 @@ use tokio::sync::oneshot;
 
 use crate::sinks::aws_cloudwatch_logs::service::CloudwatchError;
 
-pub struct CloudwatchFuture<'a> {
-    client: Client<'a>,
+pub struct CloudwatchFuture {
+    client: Client,
     state: State,
     create_missing_group: bool,
     create_missing_stream: bool,
@@ -30,13 +30,13 @@ pub struct CloudwatchFuture<'a> {
     token_tx: Option<oneshot::Sender<Option<String>>>,
 }
 
-struct Client<'a> {
+struct Client {
     client: CloudwatchLogsClient,
     smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
     aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>>,
     stream_name: String,
     group_name: String,
-    headers: &'a IndexMap<String, String>,
+    headers: &'static IndexMap<String, String>,
 }
 
 type ClientResult<T, E> = BoxFuture<'static, Result<T, SdkError<E>>>;
@@ -48,7 +48,7 @@ enum State {
     Put(ClientResult<PutLogEventsOutput, PutLogEventsError>),
 }
 
-impl <'a> CloudwatchFuture <'a> {
+impl CloudwatchFuture {
     /// Panics if events.is_empty()
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
@@ -89,7 +89,7 @@ impl <'a> CloudwatchFuture <'a> {
     }
 }
 
-impl <'a> Future for CloudwatchFuture<'a> {
+impl Future for CloudwatchFuture {
     type Output = Result<(), CloudwatchError>;
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output> {
@@ -218,7 +218,7 @@ impl <'a> Future for CloudwatchFuture<'a> {
     }
 }
 
-impl <'a> Client <'a> {
+impl Client {
     pub fn put_logs(
         &self,
         sequence_token: Option<String>,

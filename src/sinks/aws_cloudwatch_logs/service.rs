@@ -38,12 +38,12 @@ use crate::{
     },
 };
 
-type Svc<'a> = Buffer<
+type Svc = Buffer<
     ConcurrencyLimit<
         RateLimit<
             Retry<
                 FixedRetryPolicy<CloudwatchRetryLogic<()>>,
-                Buffer<Timeout<CloudwatchLogsSvc<'a>>, Vec<InputLogEvent>>,
+                Buffer<Timeout<CloudwatchLogsSvc>, Vec<InputLogEvent>>,
             >,
         >,
     >,
@@ -196,7 +196,7 @@ impl Service<BatchCloudwatchRequest> for CloudwatchLogsPartitionSvc {
     }
 }
 
-impl <'a> CloudwatchLogsSvc<'a> {
+impl CloudwatchLogsSvc {
     pub fn new(
         config: &CloudwatchLogsSinkConfig,
         key: &CloudwatchKey,
