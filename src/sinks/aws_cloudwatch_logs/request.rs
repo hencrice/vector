@@ -225,7 +225,7 @@ impl Client {
         log_events: Vec<InputLogEvent>,
     ) -> ClientResult<PutLogEventsOutput, PutLogEventsError> {
         let client = self.smithy_client.clone();
-        let conf = self.client.clone().conf();
+        let cw_client = self.client.clone();
         let group_name = self.group_name.clone();
         let stream_name = self.stream_name.clone();
         let headers = self.headers.clone();
@@ -240,15 +240,15 @@ impl Client {
             .log_stream_name(stream_name)
             .build()
             .map_err(|err| aws_smithy_http::result::SdkError::ConstructionFailure(err.into()))?
-            .make_operation(conf)
+            .make_operation(cw_client.conf())
             .await
             .map_err(|err| {
                 aws_smithy_http::result::SdkError::ConstructionFailure(err.into())
             })?;
             
             let (req, parts) = op.into_request_response();
-            let (body, props) = req.into_parts();
-            for(header, value) in headers.iter() {
+            let (mut body, props) = req.into_parts();
+            for(header, value) in headers.into_iter() {
                 body.headers_mut().insert(header.as_str(), http::HeaderValue::from_static(value.as_str()));
             }
             client.call(Operation::from_parts(Request::from_parts(body, props), parts)).await
