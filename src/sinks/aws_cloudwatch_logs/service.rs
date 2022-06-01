@@ -271,7 +271,7 @@ impl <'a> CloudwatchLogsSvc<'a> {
     }
 }
 
-impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc<'a> {
+impl <'a> Service<Vec<InputLogEvent>> for CloudwatchLogsSvc<'a> {
     type Response = ();
     type Error = CloudwatchError;
     type Future<'a> = request::CloudwatchFuture<'a>;
@@ -291,7 +291,7 @@ impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc<'a> {
             let (tx, rx) = oneshot::channel();
             self.token_rx = Some(rx);
 
-            request::CloudwatchFuture<'a>::new(
+            request::CloudwatchFuture::new(
                 self.client.clone(),
                 self.smithy_client.clone(),
                 self.headers,
@@ -329,9 +329,9 @@ impl EncodedLength for InputLogEvent {
 }
 
 #[derive(Clone)]
-pub struct CloudwatchLogsPartitionSvc {
+pub struct CloudwatchLogsPartitionSvc<'a> {
     config: CloudwatchLogsSinkConfig,
-    clients: HashMap<CloudwatchKey, Svc>,
+    clients: HashMap<CloudwatchKey, Svc<'a>>,
     request_settings: TowerRequestSettings,
     client: CloudwatchLogsClient,
     smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,

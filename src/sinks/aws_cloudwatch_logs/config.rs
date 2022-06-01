@@ -49,7 +49,7 @@ impl ClientBuilder for CloudwatchLogsClientBuilder {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
-pub struct CloudwatchLogsSinkConfig {
+pub struct CloudwatchLogsSinkConfig<'a> {
     pub group_name: Template,
     pub stream_name: Template,
     #[serde(flatten)]
@@ -77,7 +77,7 @@ pub struct CloudwatchLogsSinkConfig {
     pub acknowledgements: AcknowledgementsConfig,
 }
 
-impl CloudwatchLogsSinkConfig {
+impl <'a>CloudwatchLogsSinkConfig<'a> {
     pub async fn create_client(&self, proxy: &ProxyConfig) -> crate::Result<CloudwatchLogsClient> {
         create_client::<CloudwatchLogsClientBuilder>(
             &self.auth,
@@ -111,7 +111,7 @@ impl CloudwatchLogsSinkConfig {
 
 #[async_trait::async_trait]
 #[typetag::serde(name = "aws_cloudwatch_logs")]
-impl SinkConfig for CloudwatchLogsSinkConfig {
+impl <'a> SinkConfig for CloudwatchLogsSinkConfig <'a> {
     async fn build(&self, cx: SinkContext) -> crate::Result<(VectorSink, Healthcheck)> {
         let batcher_settings = self.batch.into_batcher_settings()?;
         let request_settings = self.request.tower.unwrap_with(&TowerRequestConfig::default());
@@ -157,7 +157,7 @@ impl SinkConfig for CloudwatchLogsSinkConfig {
     }
 }
 
-impl GenerateConfig for CloudwatchLogsSinkConfig {
+impl <'a>GenerateConfig for CloudwatchLogsSinkConfig<'a> {
     fn generate_config() -> toml::Value {
         toml::Value::try_from(default_config(StandardEncodings::Json)).unwrap()
     }
