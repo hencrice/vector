@@ -121,7 +121,9 @@ pub async fn resolve_region(region: Option<Region>) -> crate::Result<Region> {
         None => aws_config::default_provider::region::default_provider()
             .region()
             .await
-            .ok_or_else(|| "Could not determine region from Vector configuration or default providers".into()),
+            .ok_or_else(|| {
+                "Could not determine region from Vector configuration or default providers".into()
+            }),
     }
 }
 

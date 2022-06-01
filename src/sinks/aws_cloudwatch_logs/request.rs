@@ -19,12 +19,7 @@ use futures::{future::BoxFuture, ready, FutureExt};
 use indexmap::IndexMap;
 use tokio::sync::oneshot;
 
-use crate::sinks::aws_cloudwatch_logs::{
-    service::{
-        CloudwatchError,
-        SmithyClient,
-    },
-};
+use crate::sinks::aws_cloudwatch_logs::service::{CloudwatchError, SmithyClient};
 
 pub struct CloudwatchFuture {
     client: Client,

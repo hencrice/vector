@@ -6,7 +6,8 @@ use tower::ServiceBuilder;
 
 use crate::{
     aws::{
-        create_client, create_smithy_client, resolve_region, AwsAuthentication, ClientBuilder, RegionOrEndpoint,
+        create_client, create_smithy_client, resolve_region, AwsAuthentication, ClientBuilder,
+        RegionOrEndpoint,
     },
     codecs::Encoder,
     config::{
