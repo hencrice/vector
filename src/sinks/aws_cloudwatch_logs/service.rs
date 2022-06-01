@@ -196,7 +196,7 @@ impl Service<BatchCloudwatchRequest> for CloudwatchLogsPartitionSvc {
     }
 }
 
-impl CloudwatchLogsSvc {
+impl CloudwatchLogsSvc<'a> {
     pub fn new(
         config: &CloudwatchLogsSinkConfig,
         key: &CloudwatchKey,

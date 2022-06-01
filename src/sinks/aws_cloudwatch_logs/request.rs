@@ -21,8 +21,8 @@ use tokio::sync::oneshot;
 
 use crate::sinks::aws_cloudwatch_logs::service::CloudwatchError;
 
-pub struct CloudwatchFuture {
-    client: Client,
+pub struct CloudwatchFuture<'a> {
+    client: Client<'a>,
     state: State,
     create_missing_group: bool,
     create_missing_stream: bool,
@@ -218,7 +218,7 @@ impl Future for CloudwatchFuture {
     }
 }
 
-impl Client {
+impl Client<'a> {
     pub fn put_logs(
         &self,
         sequence_token: Option<String>,
