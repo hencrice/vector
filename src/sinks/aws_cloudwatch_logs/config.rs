@@ -122,7 +122,7 @@ impl SinkConfig for CloudwatchLogsSinkConfig {
             .service(CloudwatchLogsPartitionSvc::new(
                 self.clone(),
                 client.clone(),
-                std::sync::Arc::new(smithy_client).clone(),
+                std::sync::Arc::new(smithy_client),
             ));
         let transformer = self.encoding.transformer();
         let serializer = self.encoding.clone().encoding();

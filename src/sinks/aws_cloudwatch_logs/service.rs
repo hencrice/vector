@@ -195,7 +195,7 @@ impl Service<BatchCloudwatchRequest> for CloudwatchLogsPartitionSvc {
                     self.config.clone(),
                     &key,
                     self.client.clone(),
-                    self.smithy_client.clone(),
+                    std::sync::Arc::clone(&self.smithy_client),
                 ));
 
             self.clients.insert(key, svc.clone());
@@ -308,7 +308,7 @@ impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc {
 
             request::CloudwatchFuture::new(
                 self.client.clone(),
-                self.smithy_client.clone(),
+                std::sync::Arc::clone(&self.smithy_client),
                 self.headers.clone(),
                 self.stream_name.clone(),
                 self.group_name.clone(),
