@@ -38,7 +38,7 @@ use crate::{
     },
 };
 
-type Svc = Buffer<
+type Svc<'a> = Buffer<
     ConcurrencyLimit<
         RateLimit<
             Retry<
@@ -196,7 +196,7 @@ impl Service<BatchCloudwatchRequest> for CloudwatchLogsPartitionSvc {
     }
 }
 
-impl CloudwatchLogsSvc<'a> {
+impl <'a> CloudwatchLogsSvc<'a> {
     pub fn new(
         config: &CloudwatchLogsSinkConfig,
         key: &CloudwatchKey,
@@ -274,7 +274,7 @@ impl CloudwatchLogsSvc<'a> {
 impl Service<Vec<InputLogEvent>> for CloudwatchLogsSvc<'a> {
     type Response = ();
     type Error = CloudwatchError;
-    type Future = request::CloudwatchFuture;
+    type Future<'a> = request::CloudwatchFuture<'a>;
 
     fn poll_ready(&mut self, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
         if let Some(rx) = &mut self.token_rx {
