@@ -94,7 +94,7 @@ impl CloudwatchLogsSinkConfig {
         &self,
         proxy: &ProxyConfig,
     ) -> crate::Result<aws_smithy_client::Client> {
-        let region = resolve_region(self.region.region())?;
+        let region = resolve_region(self.region.region()).await?;
         create_smithy_client::<CloudwatchLogsClientBuilder>(
             region,
             proxy,

@@ -122,7 +122,7 @@ pub async fn resolve_region(region: Option<Region>) -> crate::Result<Region> {
             .region()
             .await
             .ok_or("Could not determine region from Vector configuration or default providers"),
-    }?;
+    }
 }
 
 pub async fn create_client<T: ClientBuilder>(
@@ -137,7 +137,7 @@ pub async fn create_client<T: ClientBuilder>(
 
     // The default credentials chains will look for a region if not given but we'd like to
     // error up front if later SDK calls will fail due to lack of region configuration
-    let region = resolve_region(region)?;
+    let region = resolve_region(region).await?;
 
     // Build the configuration first.
     let mut config_builder = SdkConfig::builder()
