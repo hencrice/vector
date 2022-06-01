@@ -176,7 +176,7 @@ impl Service<BatchCloudwatchRequest> for CloudwatchLogsPartitionSvc {
                 .buffer(1)
                 .timeout(self.request_settings.timeout)
                 .service(CloudwatchLogsSvc::new(
-                    self.config,
+                    self.config.clone(),
                     &key,
                     self.client.clone(),
                     self.smithy_client.clone(),
