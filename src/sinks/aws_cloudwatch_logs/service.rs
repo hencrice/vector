@@ -176,7 +176,7 @@ impl Service<BatchCloudwatchRequest> for CloudwatchLogsPartitionSvc {
                 .buffer(1)
                 .timeout(self.request_settings.timeout)
                 .service(CloudwatchLogsSvc::new(
-                    &self.config,
+                    self.config,
                     &key,
                     self.client.clone(),
                     self.smithy_client.clone(),
@@ -198,7 +198,7 @@ impl Service<BatchCloudwatchRequest> for CloudwatchLogsPartitionSvc {
 
 impl CloudwatchLogsSvc {
     pub fn new(
-        config: &'static CloudwatchLogsSinkConfig,
+        config: CloudwatchLogsSinkConfig,
         key: &CloudwatchKey,
         client: CloudwatchLogsClient,
         smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
@@ -211,7 +211,7 @@ impl CloudwatchLogsSvc {
         let create_missing_stream = config.create_missing_stream.unwrap_or(true);
 
         CloudwatchLogsSvc {
-            headers: &config.request.headers,
+            headers: config.request.headers,
             client,
             smithy_client,
             stream_name,
@@ -313,7 +313,7 @@ pub struct CloudwatchLogsSvc {
     client: CloudwatchLogsClient,
     smithy_client: std::sync::Arc<aws_smithy_client::Client<aws_smithy_client::erase::DynConnector,
     aws_smithy_client::erase::DynMiddleware<aws_smithy_client::erase::DynConnector>>>,
-    headers: &'static IndexMap<String, String>,
+    headers: IndexMap<String, String>,
     stream_name: String,
     group_name: String,
     create_missing_group: bool,
