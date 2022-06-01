@@ -225,7 +225,7 @@ impl Client {
         log_events: Vec<InputLogEvent>,
     ) -> ClientResult<PutLogEventsOutput, PutLogEventsError> {
         let client = self.smithy_client.clone();
-        let conf = self.client.conf().clone();
+        let conf = self.client.clone().conf();
         let group_name = self.group_name.clone();
         let stream_name = self.stream_name.clone();
         let headers = self.headers.clone();
